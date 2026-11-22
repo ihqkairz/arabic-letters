@@ -1,0 +1,577 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Arabic Letters</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Amiri:wght@400;700&display=swap" rel="stylesheet">
+<style>
+  /* ---------------------------------------------------------------
+     DESIGN TOKENS
+     Change any of these hex values and the whole page shifts with it.
+     --------------------------------------------------------------- */
+  :root {
+    --ground:  #0E1D24;   /* deep petrol background */
+    --surface: #16303A;   /* raised panels */
+    --edge:    #24454F;   /* hairlines */
+    --chalk:   #F2EFE6;   /* the letter itself */
+    --muted:   #8AA6AF;   /* secondary text */
+    --lapis:   #4C7FA8;   /* structure, correct */
+    --saffron: #D4A13A;   /* connecting strokes, highlight */
+    --clay:    #B4483C;   /* wrong */
+
+    --arabic: 'Amiri', 'Traditional Arabic', 'Geeza Pro', 'Noto Naskh Arabic', serif;
+    --ui: ui-sans-serif, system-ui, -apple-system, 'Segoe UI', sans-serif;
+  }
+
+  * { box-sizing: border-box; }
+
+  body {
+    margin: 0;
+    background: var(--ground);
+    color: var(--chalk);
+    font-family: var(--ui);
+    -webkit-font-smoothing: antialiased;
+    display: flex;
+    justify-content: center;
+    padding: 20px 16px 56px;
+  }
+
+  .app { width: 100%; max-width: 520px; }
+
+  /* ---- header ---- */
+  header { margin-bottom: 22px; }
+
+  h1 {
+    font-family: var(--arabic);
+    font-size: 30px;
+    font-weight: 700;
+    line-height: 1.1;
+    margin: 0 0 6px;
+    letter-spacing: -0.01em;
+  }
+
+  .tagline { color: var(--muted); font-size: 14px; margin: 0; }
+
+  /* ---- mode switch ---- */
+  .switch {
+    display: flex;
+    gap: 2px;
+    background: var(--surface);
+    border: 1px solid var(--edge);
+    border-radius: 10px;
+    padding: 3px;
+    margin: 20px 0 22px;
+  }
+
+  .switch button {
+    flex: 1;
+    padding: 9px 0;
+    background: none;
+    border: 0;
+    border-radius: 7px;
+    color: var(--muted);
+    font: inherit;
+    font-size: 14px;
+    cursor: pointer;
+  }
+
+  .switch button[aria-pressed="true"] {
+    background: var(--lapis);
+    color: #08161C;
+    font-weight: 600;
+  }
+
+  /* ---- the hero glyph ---- */
+  .stage {
+    background: var(--surface);
+    border: 1px solid var(--edge);
+    border-radius: 14px;
+    padding: 28px 16px 24px;
+    text-align: center;
+    margin-bottom: 18px;
+  }
+
+  .glyph {
+    font-family: var(--arabic);
+    font-size: 140px;
+    line-height: 1.35;
+    direction: rtl;
+    color: var(--chalk);
+    user-select: none;
+  }
+
+  /* The joining strokes get their own colour. This is the whole point of
+     the app: it shows you which part is the LETTER and which part is just
+     the stroke connecting it to its neighbours. */
+  .tail { color: var(--saffron); opacity: 0.55; }
+
+  .position-label {
+    font-size: 13px;
+    color: var(--muted);
+    margin-top: 4px;
+  }
+
+  /* ---- answer choices ---- */
+  .choices {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+  }
+
+  .choice {
+    background: var(--surface);
+    border: 1px solid var(--edge);
+    border-radius: 11px;
+    color: var(--chalk);
+    font: inherit;
+    font-size: 17px;
+    padding: 16px 10px;
+    cursor: pointer;
+    transition: border-color .12s, background .12s;
+  }
+
+  .choice:hover:not(:disabled) { border-color: var(--lapis); }
+  .choice:focus-visible { outline: 2px solid var(--saffron); outline-offset: 2px; }
+  .choice .key { color: var(--muted); font-size: 12px; margin-right: 7px; }
+  .choice.correct { background: var(--lapis); border-color: var(--lapis); color: #08161C; font-weight: 600; }
+  .choice.wrong { background: var(--clay); border-color: var(--clay); }
+  .choice:disabled { cursor: default; }
+
+  /* ---- feedback line ---- */
+  .feedback {
+    min-height: 44px;
+    margin-top: 16px;
+    font-size: 15px;
+    color: var(--muted);
+    text-align: center;
+    line-height: 1.5;
+  }
+
+  .feedback b { color: var(--chalk); font-weight: 600; }
+
+  /* ---- score strip ---- */
+  .score {
+    display: flex;
+    justify-content: space-between;
+    font-size: 13px;
+    color: var(--muted);
+    border-top: 1px solid var(--edge);
+    padding-top: 12px;
+    margin-top: 18px;
+  }
+
+  .score b { color: var(--saffron); font-weight: 600; }
+
+  /* ---- level picker ---- */
+  .levels { display: flex; gap: 8px; margin-bottom: 18px; }
+
+  .levels button {
+    flex: 1;
+    background: none;
+    border: 1px solid var(--edge);
+    border-radius: 9px;
+    color: var(--muted);
+    font: inherit;
+    font-size: 13px;
+    padding: 9px 4px;
+    cursor: pointer;
+  }
+
+  .levels button[aria-pressed="true"] { border-color: var(--saffron); color: var(--saffron); }
+
+  /* ---- learn grid ---- */
+  .grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 8px;
+  }
+
+  .tile {
+    aspect-ratio: 1;
+    background: var(--surface);
+    border: 1px solid var(--edge);
+    border-radius: 10px;
+    color: var(--chalk);
+    font-family: var(--arabic);
+    font-size: 34px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .tile:hover { border-color: var(--lapis); }
+  .tile:focus-visible { outline: 2px solid var(--saffron); outline-offset: 2px; }
+
+  /* ---- letter detail ---- */
+  .detail {
+    background: var(--surface);
+    border: 1px solid var(--edge);
+    border-radius: 14px;
+    padding: 20px 16px;
+    margin-bottom: 14px;
+  }
+
+  .detail h2 {
+    font-size: 20px;
+    margin: 0 0 2px;
+  }
+
+  .detail .sound { color: var(--muted); font-size: 14px; margin: 0 0 18px; }
+
+  .forms {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 6px;
+    direction: rtl;
+  }
+
+  .form-cell { text-align: center; }
+
+  .form-cell .g {
+    font-family: var(--arabic);
+    font-size: 46px;
+    line-height: 1.5;
+  }
+
+  .form-cell .n {
+    font-family: var(--ui);
+    direction: ltr;
+    font-size: 11px;
+    color: var(--muted);
+  }
+
+  .form-cell.none .g { color: var(--edge); }
+
+  .note {
+    font-size: 13px;
+    color: var(--muted);
+    line-height: 1.55;
+    margin: 16px 0 0;
+    padding-top: 14px;
+    border-top: 1px solid var(--edge);
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    * { transition: none !important; }
+  }
+
+  @media (max-width: 380px) {
+    .glyph { font-size: 108px; }
+    .grid { grid-template-columns: repeat(3, 1fr); }
+  }
+</style>
+</head>
+<body>
+<div class="app">
+
+  <header>
+    <h1>Arabic letters</h1>
+    <p class="tagline">Twenty-eight letters. The shape changes depending on where it sits in the word — that's the part that makes it look unreadable at first.</p>
+  </header>
+
+  <div class="switch" role="group" aria-label="Mode">
+    <button id="btn-learn" aria-pressed="true">Learn</button>
+    <button id="btn-drill" aria-pressed="false">Drill</button>
+  </div>
+
+  <main id="view"></main>
+
+</div>
+
+<script>
+/* =================================================================
+   1. THE DATA
+   Everything the app knows lives in this one array. Add, remove, or
+   change anything here and the interface updates on refresh.
+
+   forms: the letter written on its own, at the start of a word, in
+   the middle, and at the end. Six letters never connect forward, so
+   their initial and medial forms are null.
+
+   group: letters that share the same skeleton and differ only in
+   dots. Used to pick hard wrong answers in the drill.
+   ================================================================= */
+const LETTERS = [
+  { ar:'ا', name:'alif',  sound:'long "aa"',                 group:'solo',  forms:{ isolated:'ا', initial:null,  medial:null,   final:'ـا' } },
+  { ar:'ب', name:'ba',    sound:'b as in book',              group:'tooth', forms:{ isolated:'ب', initial:'بـ', medial:'ـبـ', final:'ـب' } },
+  { ar:'ت', name:'ta',    sound:'t as in top',               group:'tooth', forms:{ isolated:'ت', initial:'تـ', medial:'ـتـ', final:'ـت' } },
+  { ar:'ث', name:'tha',   sound:'th as in think',            group:'tooth', forms:{ isolated:'ث', initial:'ثـ', medial:'ـثـ', final:'ـث' } },
+  { ar:'ج', name:'jim',   sound:'j as in jam',               group:'jim',   forms:{ isolated:'ج', initial:'جـ', medial:'ـجـ', final:'ـج' } },
+  { ar:'ح', name:'ha',    sound:'breathy h from the throat', group:'jim',   forms:{ isolated:'ح', initial:'حـ', medial:'ـحـ', final:'ـح' } },
+  { ar:'خ', name:'kha',   sound:'kh as in Scottish "loch"',  group:'jim',   forms:{ isolated:'خ', initial:'خـ', medial:'ـخـ', final:'ـخ' } },
+  { ar:'د', name:'dal',   sound:'d as in door',              group:'dal',   forms:{ isolated:'د', initial:null,  medial:null,   final:'ـد' } },
+  { ar:'ذ', name:'dhal',  sound:'th as in this',             group:'dal',   forms:{ isolated:'ذ', initial:null,  medial:null,   final:'ـذ' } },
+  { ar:'ر', name:'ra',    sound:'a tapped r',                group:'ra',    forms:{ isolated:'ر', initial:null,  medial:null,   final:'ـر' } },
+  { ar:'ز', name:'zay',   sound:'z as in zoo',               group:'ra',    forms:{ isolated:'ز', initial:null,  medial:null,   final:'ـز' } },
+  { ar:'س', name:'sin',   sound:'s as in sun',               group:'sin',   forms:{ isolated:'س', initial:'سـ', medial:'ـسـ', final:'ـس' } },
+  { ar:'ش', name:'shin',  sound:'sh as in shoe',             group:'sin',   forms:{ isolated:'ش', initial:'شـ', medial:'ـشـ', final:'ـش' } },
+  { ar:'ص', name:'sad',   sound:'a heavy, deep s',           group:'sad',   forms:{ isolated:'ص', initial:'صـ', medial:'ـصـ', final:'ـص' } },
+  { ar:'ض', name:'dad',   sound:'a heavy, deep d',           group:'sad',   forms:{ isolated:'ض', initial:'ضـ', medial:'ـضـ', final:'ـض' } },
+  { ar:'ط', name:'ta (heavy)', sound:'a heavy, deep t',      group:'ta',    forms:{ isolated:'ط', initial:'طـ', medial:'ـطـ', final:'ـط' } },
+  { ar:'ظ', name:'dha (heavy)', sound:'a heavy, deep th',    group:'ta',    forms:{ isolated:'ظ', initial:'ظـ', medial:'ـظـ', final:'ـظ' } },
+  { ar:'ع', name:'ayn',   sound:'a squeeze in the throat',   group:'ayn',   forms:{ isolated:'ع', initial:'عـ', medial:'ـعـ', final:'ـع' } },
+  { ar:'غ', name:'ghayn', sound:'like a French r, gargled',  group:'ayn',   forms:{ isolated:'غ', initial:'غـ', medial:'ـغـ', final:'ـغ' } },
+  { ar:'ف', name:'fa',    sound:'f as in fan',               group:'fa',    forms:{ isolated:'ف', initial:'فـ', medial:'ـفـ', final:'ـف' } },
+  { ar:'ق', name:'qaf',   sound:'k from the back of throat', group:'fa',    forms:{ isolated:'ق', initial:'قـ', medial:'ـقـ', final:'ـق' } },
+  { ar:'ك', name:'kaf',   sound:'k as in kite',              group:'solo',  forms:{ isolated:'ك', initial:'كـ', medial:'ـكـ', final:'ـك' } },
+  { ar:'ل', name:'lam',   sound:'l as in lamp',              group:'solo',  forms:{ isolated:'ل', initial:'لـ', medial:'ـلـ', final:'ـل' } },
+  { ar:'م', name:'mim',   sound:'m as in moon',              group:'solo',  forms:{ isolated:'م', initial:'مـ', medial:'ـمـ', final:'ـم' } },
+  { ar:'ن', name:'nun',   sound:'n as in noon',              group:'tooth', forms:{ isolated:'ن', initial:'نـ', medial:'ـنـ', final:'ـن' } },
+  { ar:'ه', name:'ha (light)', sound:'h as in hat',          group:'solo',  forms:{ isolated:'ه', initial:'هـ', medial:'ـهـ', final:'ـه' } },
+  { ar:'و', name:'waw',   sound:'w, or long "oo"',           group:'solo',  forms:{ isolated:'و', initial:null,  medial:null,   final:'ـو' } },
+  { ar:'ي', name:'ya',    sound:'y, or long "ee"',           group:'tooth', forms:{ isolated:'ي', initial:'يـ', medial:'ـيـ', final:'ـي' } }
+];
+
+const POSITION_NAMES = {
+  isolated: 'on its own',
+  initial:  'start of a word',
+  medial:   'middle of a word',
+  final:    'end of a word'
+};
+
+/* =================================================================
+   2. STATE
+   Everything that changes while the app is running.
+   Nothing here survives a refresh yet — see the note at the bottom.
+   ================================================================= */
+let state = {
+  mode: 'learn',        // 'learn' or 'drill'
+  level: 'isolated',    // 'isolated' or 'all'
+  openLetter: null,     // which letter is expanded in Learn mode
+  question: null,       // the current drill question
+  answered: null,       // the name the user picked, or null
+  correct: 0,
+  asked: 0,
+  streak: 0
+};
+
+/* =================================================================
+   3. HELPERS
+   ================================================================= */
+
+// The stretch character (tatweel) is what joins letters together.
+// We wrap it in its own span so it can be coloured separately.
+function paintGlyph(text) {
+  return [...text].map(ch =>
+    ch === 'ـ' ? '<span class="tail">ـ</span>' : ch
+  ).join('');
+}
+
+function pickRandom(list) {
+  return list[Math.floor(Math.random() * list.length)];
+}
+
+function shuffle(list) {
+  const copy = [...list];
+  for (let i = copy.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [copy[i], copy[j]] = [copy[j], copy[i]];
+  }
+  return copy;
+}
+
+function escapeHtml(s) {
+  return s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+}
+
+/* =================================================================
+   4. BUILDING A QUESTION
+   Pick a letter, pick one of its forms, then pick three wrong answers.
+   Wrong answers come from the same skeleton group where possible, so
+   you are forced to actually look at the dots.
+   ================================================================= */
+function makeQuestion() {
+  const letter = pickRandom(LETTERS);
+
+  const available = state.level === 'isolated'
+    ? ['isolated']
+    : Object.keys(letter.forms).filter(k => letter.forms[k] !== null);
+
+  const position = pickRandom(available);
+
+  const sameGroup = LETTERS.filter(l => l.group === letter.group && l.name !== letter.name);
+  const others    = LETTERS.filter(l => l.group !== letter.group);
+
+  const distractors = [...shuffle(sameGroup), ...shuffle(others)].slice(0, 3);
+
+  return {
+    letter,
+    position,
+    options: shuffle([letter, ...distractors])
+  };
+}
+
+function nextQuestion() {
+  state.question = makeQuestion();
+  state.answered = null;
+  render();
+}
+
+/* =================================================================
+   5. RENDERING
+   One function per screen. Each returns an HTML string.
+   ================================================================= */
+const view = document.getElementById('view');
+
+function renderLearn() {
+  let html = '';
+
+  if (state.openLetter) {
+    const l = state.openLetter;
+    const cells = ['isolated', 'initial', 'medial', 'final'].map(pos => {
+      const glyph = l.forms[pos];
+      if (!glyph) {
+        return `<div class="form-cell none">
+                  <div class="g">—</div>
+                  <div class="n">${POSITION_NAMES[pos]}</div>
+                </div>`;
+      }
+      return `<div class="form-cell">
+                <div class="g">${paintGlyph(glyph)}</div>
+                <div class="n">${POSITION_NAMES[pos]}</div>
+              </div>`;
+    }).join('');
+
+    const joins = l.forms.initial
+      ? 'Connects on both sides.'
+      : 'Never connects to the letter that follows it, so a word can break apart right after it.';
+
+    html += `<div class="detail">
+               <h2>${escapeHtml(l.name)}</h2>
+               <p class="sound">${escapeHtml(l.sound)}</p>
+               ${`<div class="forms">${cells}</div>`}
+               <p class="note">${joins} The gold strokes are not part of the letter — they are the joins to whatever sits beside it.</p>
+             </div>`;
+  }
+
+  html += `<div class="grid">` + LETTERS.map((l, i) =>
+    `<button class="tile" data-letter="${i}" aria-label="${escapeHtml(l.name)}">${l.ar}</button>`
+  ).join('') + `</div>`;
+
+  view.innerHTML = html;
+
+  view.querySelectorAll('.tile').forEach(tile => {
+    tile.onclick = () => {
+      const l = LETTERS[Number(tile.dataset.letter)];
+      state.openLetter = (state.openLetter === l) ? null : l;
+      render();
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    };
+  });
+}
+
+function renderDrill() {
+  if (!state.question) state.question = makeQuestion();
+
+  const q = state.question;
+  const glyph = q.letter.forms[q.position];
+
+  const choices = q.options.map((opt, i) => {
+    let cls = 'choice';
+    if (state.answered) {
+      if (opt.name === q.letter.name) cls += ' correct';
+      else if (opt.name === state.answered) cls += ' wrong';
+    }
+    return `<button class="${cls}" data-name="${escapeHtml(opt.name)}" ${state.answered ? 'disabled' : ''}>
+              <span class="key">${i + 1}</span>${escapeHtml(opt.name)}
+            </button>`;
+  }).join('');
+
+  let feedback = 'Which letter is this?';
+  if (state.answered) {
+    feedback = state.answered === q.letter.name
+      ? `Yes — <b>${escapeHtml(q.letter.name)}</b>, ${escapeHtml(q.letter.sound)}. Press space for the next one.`
+      : `That was <b>${escapeHtml(q.letter.name)}</b>, ${escapeHtml(q.letter.sound)}. Press space to keep going.`;
+  }
+
+  view.innerHTML = `
+    <div class="levels" role="group" aria-label="Difficulty">
+      <button id="lvl-isolated" aria-pressed="${state.level === 'isolated'}">Letters on their own</button>
+      <button id="lvl-all" aria-pressed="${state.level === 'all'}">All four positions</button>
+    </div>
+
+    <div class="stage">
+      <div class="glyph" dir="rtl">${paintGlyph(glyph)}</div>
+      <div class="position-label">${POSITION_NAMES[q.position]}</div>
+    </div>
+
+    <div class="choices">${choices}</div>
+    <p class="feedback">${feedback}</p>
+
+    <div class="score">
+      <span>Correct <b>${state.correct}</b> of ${state.asked}</span>
+      <span>Streak <b>${state.streak}</b></span>
+    </div>
+  `;
+
+  view.querySelectorAll('.choice').forEach(btn => {
+    btn.onclick = () => answer(btn.dataset.name);
+  });
+
+  document.getElementById('lvl-isolated').onclick = () => setLevel('isolated');
+  document.getElementById('lvl-all').onclick = () => setLevel('all');
+}
+
+function setLevel(level) {
+  state.level = level;
+  nextQuestion();
+}
+
+function answer(name) {
+  if (state.answered) return;
+  state.answered = name;
+  state.asked++;
+  if (name === state.question.letter.name) {
+    state.correct++;
+    state.streak++;
+  } else {
+    state.streak = 0;
+  }
+  render();
+}
+
+function render() {
+  document.getElementById('btn-learn').setAttribute('aria-pressed', state.mode === 'learn');
+  document.getElementById('btn-drill').setAttribute('aria-pressed', state.mode === 'drill');
+  if (state.mode === 'learn') renderLearn();
+  else renderDrill();
+}
+
+/* =================================================================
+   6. WIRING IT UP
+   ================================================================= */
+document.getElementById('btn-learn').onclick = () => { state.mode = 'learn'; render(); };
+document.getElementById('btn-drill').onclick = () => { state.mode = 'drill'; nextQuestion(); };
+
+document.addEventListener('keydown', e => {
+  if (state.mode !== 'drill') return;
+
+  if (e.key === ' ' || e.key === 'Enter') {
+    e.preventDefault();
+    if (state.answered) nextQuestion();
+    return;
+  }
+
+  const n = Number(e.key);
+  if (n >= 1 && n <= 4 && !state.answered) {
+    const btn = view.querySelectorAll('.choice')[n - 1];
+    if (btn) answer(btn.dataset.name);
+  }
+});
+
+render();
+
+/* -----------------------------------------------------------------
+   NEXT STEP, LEFT FOR YOU:
+   Right now your score resets every time the page reloads. Saving it
+   is about six lines. Look up localStorage.setItem and
+   localStorage.getItem, then save `state.correct` and `state.asked`
+   when they change and read them back when the page starts.
+   ----------------------------------------------------------------- */
+</script>
+</body>
+</html>
