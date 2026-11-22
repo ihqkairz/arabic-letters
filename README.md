@@ -2,10 +2,13 @@
 
 A practice site for reading the Arabic alphabet.
 
-Two modes:
+Live at: https://ihqkairz.github.io/arabic-letters
 
-- **Learn** — all 28 letters. Tap one to see how its shape changes depending on where it sits in a word.
-- **Drill** — a shape appears, you pick which letter it is. Keyboard 1–4 to answer, space for the next one.
+Three tabs, meant to be used in order:
+
+- **Reference** — all 28 letters with their names. Tap one to see all four of its shapes.
+- **Recall** — a letter with no name attached. Say it out loud, then tap to check yourself.
+- **Drill** — multiple choice. Wrong answers come from letters with the same skeleton, so you have to look at the dots.
 
 The gold strokes in a letter are the *joins*, not the letter itself. Separating those
 two things in your eye is the whole point.
