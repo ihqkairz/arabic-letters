@@ -257,6 +257,33 @@
     text-align: center;
   }
 
+  /* ---- the play button ---- */
+  .play {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    background: none;
+    border: 1px solid var(--edge);
+    border-radius: 9px;
+    color: var(--chalk);
+    font: inherit;
+    font-size: 14px;
+    padding: 9px 15px;
+    cursor: pointer;
+    margin-bottom: 16px;
+  }
+
+  .play:hover { border-color: var(--saffron); color: var(--saffron); }
+  .play svg { width: 15px; height: 15px; fill: currentColor; }
+  .play.playing { border-color: var(--saffron); color: var(--saffron); }
+
+  .audio-status {
+    font-size: 12px;
+    color: var(--muted);
+    margin: 0 0 16px;
+    min-height: 16px;
+  }
+
   /* ---- expanded letter detail ---- */
   .detail {
     background: var(--surface);
@@ -348,34 +375,34 @@
    dots. Used to pick hard wrong answers in the drill.
    ================================================================= */
 const LETTERS = [
-  { ar:'ا', name:'alif',  sound:'long "aa"',                 group:'solo',  forms:{ isolated:'ا', initial:null,  medial:null,   final:'ـا' } },
-  { ar:'ب', name:'ba',    sound:'b as in book',              group:'tooth', forms:{ isolated:'ب', initial:'بـ', medial:'ـبـ', final:'ـب' } },
-  { ar:'ت', name:'ta',    sound:'t as in top',               group:'tooth', forms:{ isolated:'ت', initial:'تـ', medial:'ـتـ', final:'ـت' } },
-  { ar:'ث', name:'tha',   sound:'th as in think',            group:'tooth', forms:{ isolated:'ث', initial:'ثـ', medial:'ـثـ', final:'ـث' } },
-  { ar:'ج', name:'jim',   sound:'j as in jam',               group:'jim',   forms:{ isolated:'ج', initial:'جـ', medial:'ـجـ', final:'ـج' } },
-  { ar:'ح', name:'ha',    sound:'breathy h from the throat', group:'jim',   forms:{ isolated:'ح', initial:'حـ', medial:'ـحـ', final:'ـح' } },
-  { ar:'خ', name:'kha',   sound:'kh as in Scottish "loch"',  group:'jim',   forms:{ isolated:'خ', initial:'خـ', medial:'ـخـ', final:'ـخ' } },
-  { ar:'د', name:'dal',   sound:'d as in door',              group:'dal',   forms:{ isolated:'د', initial:null,  medial:null,   final:'ـد' } },
-  { ar:'ذ', name:'dhal',  sound:'th as in this',             group:'dal',   forms:{ isolated:'ذ', initial:null,  medial:null,   final:'ـذ' } },
-  { ar:'ر', name:'ra',    sound:'a tapped r',                group:'ra',    forms:{ isolated:'ر', initial:null,  medial:null,   final:'ـر' } },
-  { ar:'ز', name:'zay',   sound:'z as in zoo',               group:'ra',    forms:{ isolated:'ز', initial:null,  medial:null,   final:'ـز' } },
-  { ar:'س', name:'sin',   sound:'s as in sun',               group:'sin',   forms:{ isolated:'س', initial:'سـ', medial:'ـسـ', final:'ـس' } },
-  { ar:'ش', name:'shin',  sound:'sh as in shoe',             group:'sin',   forms:{ isolated:'ش', initial:'شـ', medial:'ـشـ', final:'ـش' } },
-  { ar:'ص', name:'sad',   sound:'a heavy, deep s',           group:'sad',   forms:{ isolated:'ص', initial:'صـ', medial:'ـصـ', final:'ـص' } },
-  { ar:'ض', name:'dad',   sound:'a heavy, deep d',           group:'sad',   forms:{ isolated:'ض', initial:'ضـ', medial:'ـضـ', final:'ـض' } },
-  { ar:'ط', name:'ta (heavy)', sound:'a heavy, deep t',      group:'ta',    forms:{ isolated:'ط', initial:'طـ', medial:'ـطـ', final:'ـط' } },
-  { ar:'ظ', name:'dha (heavy)', sound:'a heavy, deep th',    group:'ta',    forms:{ isolated:'ظ', initial:'ظـ', medial:'ـظـ', final:'ـظ' } },
-  { ar:'ع', name:'ayn',   sound:'a squeeze in the throat',   group:'ayn',   forms:{ isolated:'ع', initial:'عـ', medial:'ـعـ', final:'ـع' } },
-  { ar:'غ', name:'ghayn', sound:'like a French r, gargled',  group:'ayn',   forms:{ isolated:'غ', initial:'غـ', medial:'ـغـ', final:'ـغ' } },
-  { ar:'ف', name:'fa',    sound:'f as in fan',               group:'fa',    forms:{ isolated:'ف', initial:'فـ', medial:'ـفـ', final:'ـف' } },
-  { ar:'ق', name:'qaf',   sound:'k from the back of throat', group:'fa',    forms:{ isolated:'ق', initial:'قـ', medial:'ـقـ', final:'ـق' } },
-  { ar:'ك', name:'kaf',   sound:'k as in kite',              group:'solo',  forms:{ isolated:'ك', initial:'كـ', medial:'ـكـ', final:'ـك' } },
-  { ar:'ل', name:'lam',   sound:'l as in lamp',              group:'solo',  forms:{ isolated:'ل', initial:'لـ', medial:'ـلـ', final:'ـل' } },
-  { ar:'م', name:'mim',   sound:'m as in moon',              group:'solo',  forms:{ isolated:'م', initial:'مـ', medial:'ـمـ', final:'ـم' } },
-  { ar:'ن', name:'nun',   sound:'n as in noon',              group:'tooth', forms:{ isolated:'ن', initial:'نـ', medial:'ـنـ', final:'ـن' } },
-  { ar:'ه', name:'ha (light)', sound:'h as in hat',          group:'solo',  forms:{ isolated:'ه', initial:'هـ', medial:'ـهـ', final:'ـه' } },
-  { ar:'و', name:'waw',   sound:'w, or long "oo"',           group:'solo',  forms:{ isolated:'و', initial:null,  medial:null,   final:'ـو' } },
-  { ar:'ي', name:'ya',    sound:'y, or long "ee"',           group:'tooth', forms:{ isolated:'ي', initial:'يـ', medial:'ـيـ', final:'ـي' } }
+  { ar:'ا', name:'alif', arName:'أَلِف', slug:'alif',  sound:'long "aa"',                 group:'solo',  forms:{ isolated:'ا', initial:null,  medial:null,   final:'ـا' } },
+  { ar:'ب', name:'ba', arName:'باء', slug:'ba',    sound:'b as in book',              group:'tooth', forms:{ isolated:'ب', initial:'بـ', medial:'ـبـ', final:'ـب' } },
+  { ar:'ت', name:'ta', arName:'تاء', slug:'ta',    sound:'t as in top',               group:'tooth', forms:{ isolated:'ت', initial:'تـ', medial:'ـتـ', final:'ـت' } },
+  { ar:'ث', name:'tha', arName:'ثاء', slug:'tha',   sound:'th as in think',            group:'tooth', forms:{ isolated:'ث', initial:'ثـ', medial:'ـثـ', final:'ـث' } },
+  { ar:'ج', name:'jim', arName:'جيم', slug:'jim',   sound:'j as in jam',               group:'jim',   forms:{ isolated:'ج', initial:'جـ', medial:'ـجـ', final:'ـج' } },
+  { ar:'ح', name:'ha', arName:'حاء', slug:'ha',    sound:'breathy h from the throat', group:'jim',   forms:{ isolated:'ح', initial:'حـ', medial:'ـحـ', final:'ـح' } },
+  { ar:'خ', name:'kha', arName:'خاء', slug:'kha',   sound:'kh as in Scottish "loch"',  group:'jim',   forms:{ isolated:'خ', initial:'خـ', medial:'ـخـ', final:'ـخ' } },
+  { ar:'د', name:'dal', arName:'دال', slug:'dal',   sound:'d as in door',              group:'dal',   forms:{ isolated:'د', initial:null,  medial:null,   final:'ـد' } },
+  { ar:'ذ', name:'dhal', arName:'ذال', slug:'dhal',  sound:'th as in this',             group:'dal',   forms:{ isolated:'ذ', initial:null,  medial:null,   final:'ـذ' } },
+  { ar:'ر', name:'ra', arName:'راء', slug:'ra',    sound:'a tapped r',                group:'ra',    forms:{ isolated:'ر', initial:null,  medial:null,   final:'ـر' } },
+  { ar:'ز', name:'zay', arName:'زاي', slug:'zay',   sound:'z as in zoo',               group:'ra',    forms:{ isolated:'ز', initial:null,  medial:null,   final:'ـز' } },
+  { ar:'س', name:'sin', arName:'سين', slug:'sin',   sound:'s as in sun',               group:'sin',   forms:{ isolated:'س', initial:'سـ', medial:'ـسـ', final:'ـس' } },
+  { ar:'ش', name:'shin', arName:'شين', slug:'shin',  sound:'sh as in shoe',             group:'sin',   forms:{ isolated:'ش', initial:'شـ', medial:'ـشـ', final:'ـش' } },
+  { ar:'ص', name:'sad', arName:'صاد', slug:'sad',   sound:'a heavy, deep s',           group:'sad',   forms:{ isolated:'ص', initial:'صـ', medial:'ـصـ', final:'ـص' } },
+  { ar:'ض', name:'dad', arName:'ضاد', slug:'dad',   sound:'a heavy, deep d',           group:'sad',   forms:{ isolated:'ض', initial:'ضـ', medial:'ـضـ', final:'ـض' } },
+  { ar:'ط', name:'ta (heavy)', arName:'طاء', slug:'ta-heavy', sound:'a heavy, deep t',      group:'ta',    forms:{ isolated:'ط', initial:'طـ', medial:'ـطـ', final:'ـط' } },
+  { ar:'ظ', name:'dha (heavy)', arName:'ظاء', slug:'dha-heavy', sound:'a heavy, deep th',    group:'ta',    forms:{ isolated:'ظ', initial:'ظـ', medial:'ـظـ', final:'ـظ' } },
+  { ar:'ع', name:'ayn', arName:'عين', slug:'ayn',   sound:'a squeeze in the throat',   group:'ayn',   forms:{ isolated:'ع', initial:'عـ', medial:'ـعـ', final:'ـع' } },
+  { ar:'غ', name:'ghayn', arName:'غين', slug:'ghayn', sound:'like a French r, gargled',  group:'ayn',   forms:{ isolated:'غ', initial:'غـ', medial:'ـغـ', final:'ـغ' } },
+  { ar:'ف', name:'fa', arName:'فاء', slug:'fa',    sound:'f as in fan',               group:'fa',    forms:{ isolated:'ف', initial:'فـ', medial:'ـفـ', final:'ـف' } },
+  { ar:'ق', name:'qaf', arName:'قاف', slug:'qaf',   sound:'k from the back of throat', group:'fa',    forms:{ isolated:'ق', initial:'قـ', medial:'ـقـ', final:'ـق' } },
+  { ar:'ك', name:'kaf', arName:'كاف', slug:'kaf',   sound:'k as in kite',              group:'solo',  forms:{ isolated:'ك', initial:'كـ', medial:'ـكـ', final:'ـك' } },
+  { ar:'ل', name:'lam', arName:'لام', slug:'lam',   sound:'l as in lamp',              group:'solo',  forms:{ isolated:'ل', initial:'لـ', medial:'ـلـ', final:'ـل' } },
+  { ar:'م', name:'mim', arName:'ميم', slug:'mim',   sound:'m as in moon',              group:'solo',  forms:{ isolated:'م', initial:'مـ', medial:'ـمـ', final:'ـم' } },
+  { ar:'ن', name:'nun', arName:'نون', slug:'nun',   sound:'n as in noon',              group:'tooth', forms:{ isolated:'ن', initial:'نـ', medial:'ـنـ', final:'ـن' } },
+  { ar:'ه', name:'ha (light)', arName:'هاء', slug:'ha-light', sound:'h as in hat',          group:'solo',  forms:{ isolated:'ه', initial:'هـ', medial:'ـهـ', final:'ـه' } },
+  { ar:'و', name:'waw', arName:'واو', slug:'waw',   sound:'w, or long "oo"',           group:'solo',  forms:{ isolated:'و', initial:null,  medial:null,   final:'ـو' } },
+  { ar:'ي', name:'ya', arName:'ياء', slug:'ya',    sound:'y, or long "ee"',           group:'tooth', forms:{ isolated:'ي', initial:'يـ', medial:'ـيـ', final:'ـي' } }
 ];
 
 const POSITION_NAMES = {
@@ -389,7 +416,7 @@ const POSITION_NAMES = {
 const POSITION_ORDER = ['isolated', 'initial', 'medial', 'final'];
 
 const MODE_NOTES = {
-  reference: 'Every letter with its name. Tap one to see all four of its shapes.',
+  reference: 'Every letter with its name. Tap one to hear it and see all four of its shapes.',
   recall:    'A letter with no name attached. Say it out loud, then reveal to check.',
   drill:     'Pick the right name. Wrong answers come from letters with the same skeleton, so look at the dots.'
 };
@@ -441,6 +468,81 @@ function shuffle(list) {
 function escapeHtml(s) {
   return s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
 }
+
+/* -----------------------------------------------------------------
+   SOUND
+
+   Two ways to hear a letter, tried in this order:
+
+   1. A real recording. The app looks for a file named after the
+      letter inside an "audio" folder — audio/ba.mp3, audio/qaf.mp3
+      and so on. Drop a file in and it gets used automatically; no
+      code change needed.
+
+   2. The device's own Arabic voice, if it has one. Macs and iPhones
+      can read Arabic aloud, but only if an Arabic voice has been
+      installed. Many phones have none, which is why real recordings
+      are worth making.
+
+   If neither works, the app says so rather than sitting silent.
+   ----------------------------------------------------------------- */
+const AUDIO_FOLDER = 'audio/';
+
+// Ask the browser for its voice list early, because on some devices
+// the list is empty the very first time you ask for it.
+if ('speechSynthesis' in window) {
+  speechSynthesis.getVoices();
+  speechSynthesis.onvoiceschanged = () => speechSynthesis.getVoices();
+}
+
+function arabicVoice() {
+  if (!('speechSynthesis' in window)) return null;
+  return speechSynthesis.getVoices().find(v => v.lang && v.lang.toLowerCase().startsWith('ar')) || null;
+}
+
+// Shows a short line under the play button. Pass '' to clear it.
+function setAudioStatus(text) {
+  const el = document.getElementById('audio-status');
+  if (el) el.textContent = text;
+}
+
+function playLetter(letter) {
+  setAudioStatus('');
+
+  const recording = new Audio(AUDIO_FOLDER + letter.slug + '.mp3');
+
+  // If there's no recording, fall back to the device voice. Only once.
+  let usedFallback = false;
+  const fallback = () => {
+    if (usedFallback) return;
+    usedFallback = true;
+    speakLetter(letter);
+  };
+
+  recording.addEventListener('error', fallback);
+  recording.play().catch(fallback);
+}
+
+function speakLetter(letter) {
+  const voice = arabicVoice();
+
+  if (!voice) {
+    setAudioStatus('No Arabic voice on this device, and no recording for this letter yet.');
+    return;
+  }
+
+  speechSynthesis.cancel();
+  const said = new SpeechSynthesisUtterance(letter.arName);
+  said.voice = voice;
+  said.lang = voice.lang;
+  said.rate = 0.8;          // a little slower than normal speech
+  speechSynthesis.speak(said);
+}
+
+// A small speaker icon, drawn in the page rather than loaded as a file.
+const SPEAKER_ICON = `<svg viewBox="0 0 24 24" aria-hidden="true">
+  <path d="M3 9v6h4l5 5V4L7 9H3zm13.5 3a4.5 4.5 0 0 0-2.5-4v8a4.5 4.5 0 0 0 2.5-4zM14 2v2a8 8 0 0 1 0 16v2a10 10 0 0 0 0-20z"/>
+</svg>`;
 
 // Which forms of this letter are allowed at the current difficulty.
 function availablePositions(letter) {
@@ -533,6 +635,8 @@ function renderReference() {
     html += `<div class="detail">
                <h2>${escapeHtml(l.name)}</h2>
                <p class="sound">${escapeHtml(l.sound)}</p>
+               <button class="play" id="btn-play">${SPEAKER_ICON} Hear it</button>
+               <p class="audio-status" id="audio-status"></p>
                <div class="forms">${cells}</div>
                <p class="note">${joins} The gold strokes are not part of the letter — they are the joins to whatever sits beside it.</p>
              </div>`;
@@ -549,11 +653,20 @@ function renderReference() {
   view.querySelectorAll('.tile').forEach(tile => {
     tile.onclick = () => {
       const l = LETTERS[Number(tile.dataset.letter)];
-      state.openLetter = (state.openLetter === l) ? null : l;
+      const wasOpen = state.openLetter === l;
+      state.openLetter = wasOpen ? null : l;
       render();
-      window.scrollTo({ top: 0, behavior: 'smooth' });
+      // Tapping a letter opens it and says it out loud.
+      if (!wasOpen) {
+        playLetter(l);
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+      }
     };
   });
+
+  // The "Hear it" button inside the opened letter.
+  const playBtn = document.getElementById('btn-play');
+  if (playBtn) playBtn.onclick = () => playLetter(state.openLetter);
 }
 
 /* ---------- TAB 2: RECALL ---------- */
