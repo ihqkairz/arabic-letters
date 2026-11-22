@@ -55,7 +55,7 @@
 
   .tagline { color: var(--muted); font-size: 14px; margin: 0; }
 
-  /* ---- mode switch ---- */
+  /* ---- the three-tab switch ---- */
   .switch {
     display: flex;
     gap: 2px;
@@ -63,7 +63,7 @@
     border: 1px solid var(--edge);
     border-radius: 10px;
     padding: 3px;
-    margin: 20px 0 22px;
+    margin: 20px 0 10px;
   }
 
   .switch button {
@@ -84,7 +84,15 @@
     font-weight: 600;
   }
 
-  /* ---- the hero glyph ---- */
+  /* one line under the tabs saying what this screen is for */
+  .mode-note {
+    font-size: 13px;
+    color: var(--muted);
+    margin: 0 0 20px;
+    line-height: 1.5;
+  }
+
+  /* ---- the big letter on screen ---- */
   .stage {
     background: var(--surface);
     border: 1px solid var(--edge);
@@ -94,17 +102,19 @@
     margin-bottom: 18px;
   }
 
+  .stage.tappable { cursor: pointer; }
+  .stage.tappable:hover { border-color: var(--lapis); }
+
   .glyph {
     font-family: var(--arabic);
     font-size: 140px;
     line-height: 1.35;
-    direction: rtl;
     color: var(--chalk);
     user-select: none;
   }
 
   /* The joining strokes get their own colour. This is the whole point of
-     the app: it shows you which part is the LETTER and which part is just
+     the app: it shows which part is the LETTER and which part is just
      the stroke connecting it to its neighbours. */
   .tail { color: var(--saffron); opacity: 0.55; }
 
@@ -114,7 +124,36 @@
     margin-top: 4px;
   }
 
-  /* ---- answer choices ---- */
+  /* ---- the revealed answer in Recall mode ---- */
+  .reveal { margin-top: 18px; padding-top: 18px; border-top: 1px solid var(--edge); }
+  .reveal .rname { font-size: 24px; font-weight: 600; margin: 0 0 4px; }
+  .reveal .rsound { font-size: 14px; color: var(--muted); margin: 0; }
+  .reveal-prompt { margin-top: 18px; font-size: 14px; color: var(--muted); }
+
+  /* ---- buttons that advance ---- */
+  .next {
+    width: 100%;
+    background: var(--lapis);
+    border: 0;
+    border-radius: 11px;
+    color: #08161C;
+    font: inherit;
+    font-size: 16px;
+    font-weight: 600;
+    padding: 15px 0;
+    cursor: pointer;
+  }
+
+  .next.ghost {
+    background: none;
+    border: 1px solid var(--edge);
+    color: var(--chalk);
+    font-weight: 400;
+  }
+
+  .next.ghost:hover { border-color: var(--lapis); }
+
+  /* ---- answer choices in Drill mode ---- */
   .choices {
     display: grid;
     grid-template-columns: 1fr 1fr;
@@ -134,7 +173,6 @@
   }
 
   .choice:hover:not(:disabled) { border-color: var(--lapis); }
-  .choice:focus-visible { outline: 2px solid var(--saffron); outline-offset: 2px; }
   .choice .key { color: var(--muted); font-size: 12px; margin-right: 7px; }
   .choice.correct { background: var(--lapis); border-color: var(--lapis); color: #08161C; font-weight: 600; }
   .choice.wrong { background: var(--clay); border-color: var(--clay); }
@@ -165,7 +203,7 @@
 
   .score b { color: var(--saffron); font-weight: 600; }
 
-  /* ---- level picker ---- */
+  /* ---- level picker (shared by Recall and Drill) ---- */
   .levels { display: flex; gap: 8px; margin-bottom: 18px; }
 
   .levels button {
@@ -182,7 +220,7 @@
 
   .levels button[aria-pressed="true"] { border-color: var(--saffron); color: var(--saffron); }
 
-  /* ---- learn grid ---- */
+  /* ---- reference grid ---- */
   .grid {
     display: grid;
     grid-template-columns: repeat(4, 1fr);
@@ -190,43 +228,53 @@
   }
 
   .tile {
-    aspect-ratio: 1;
     background: var(--surface);
     border: 1px solid var(--edge);
     border-radius: 10px;
     color: var(--chalk);
-    font-family: var(--arabic);
-    font-size: 34px;
     cursor: pointer;
+    padding: 14px 4px 10px;
     display: flex;
+    flex-direction: column;
     align-items: center;
-    justify-content: center;
+    gap: 5px;
+    font: inherit;
   }
 
   .tile:hover { border-color: var(--lapis); }
-  .tile:focus-visible { outline: 2px solid var(--saffron); outline-offset: 2px; }
+  .tile[aria-expanded="true"] { border-color: var(--saffron); }
 
-  /* ---- letter detail ---- */
+  .tile-glyph {
+    font-family: var(--arabic);
+    font-size: 34px;
+    line-height: 1.1;
+  }
+
+  .tile-name {
+    font-size: 11px;
+    color: var(--muted);
+    line-height: 1.2;
+    text-align: center;
+  }
+
+  /* ---- expanded letter detail ---- */
   .detail {
     background: var(--surface);
-    border: 1px solid var(--edge);
+    border: 1px solid var(--saffron);
     border-radius: 14px;
     padding: 20px 16px;
     margin-bottom: 14px;
   }
 
-  .detail h2 {
-    font-size: 20px;
-    margin: 0 0 2px;
-  }
-
+  .detail h2 { font-size: 20px; margin: 0 0 2px; }
   .detail .sound { color: var(--muted); font-size: 14px; margin: 0 0 18px; }
 
+  /* Left-to-right, because the labels under them are English and you
+     learn the forms in this order: alone, start, middle, end. */
   .forms {
     display: grid;
     grid-template-columns: repeat(4, 1fr);
     gap: 6px;
-    direction: rtl;
   }
 
   .form-cell { text-align: center; }
@@ -238,8 +286,6 @@
   }
 
   .form-cell .n {
-    font-family: var(--ui);
-    direction: ltr;
     font-size: 11px;
     color: var(--muted);
   }
@@ -255,13 +301,16 @@
     border-top: 1px solid var(--edge);
   }
 
+  :focus-visible { outline: 2px solid var(--saffron); outline-offset: 2px; }
+
   @media (prefers-reduced-motion: reduce) {
     * { transition: none !important; }
   }
 
-  @media (max-width: 380px) {
+  @media (max-width: 400px) {
     .glyph { font-size: 108px; }
     .grid { grid-template-columns: repeat(3, 1fr); }
+    .switch button { font-size: 13px; }
   }
 </style>
 </head>
@@ -274,9 +323,12 @@
   </header>
 
   <div class="switch" role="group" aria-label="Mode">
-    <button id="btn-learn" aria-pressed="true">Learn</button>
+    <button id="btn-reference" aria-pressed="true">Reference</button>
+    <button id="btn-recall" aria-pressed="false">Recall</button>
     <button id="btn-drill" aria-pressed="false">Drill</button>
   </div>
+
+  <p class="mode-note" id="mode-note"></p>
 
   <main id="view"></main>
 
@@ -333,17 +385,29 @@ const POSITION_NAMES = {
   final:    'end of a word'
 };
 
+// The order you learn them in. Used by the Reference detail panel.
+const POSITION_ORDER = ['isolated', 'initial', 'medial', 'final'];
+
+const MODE_NOTES = {
+  reference: 'Every letter with its name. Tap one to see all four of its shapes.',
+  recall:    'A letter with no name attached. Say it out loud, then reveal to check.',
+  drill:     'Pick the right name. Wrong answers come from letters with the same skeleton, so look at the dots.'
+};
+
 /* =================================================================
    2. STATE
    Everything that changes while the app is running.
    Nothing here survives a refresh yet — see the note at the bottom.
    ================================================================= */
 let state = {
-  mode: 'learn',        // 'learn' or 'drill'
-  level: 'isolated',    // 'isolated' or 'all'
-  openLetter: null,     // which letter is expanded in Learn mode
-  question: null,       // the current drill question
-  answered: null,       // the name the user picked, or null
+  mode: 'reference',    // 'reference', 'recall', or 'drill'
+  level: 'isolated',    // 'isolated' or 'all' — used by Recall and Drill
+  openLetter: null,     // which letter is expanded in Reference
+  card: null,           // the current Recall card
+  revealed: false,      // has the Recall answer been shown
+  seen: 0,              // how many Recall cards you've gone through
+  question: null,       // the current Drill question
+  answered: null,       // the name you picked, or null
   correct: 0,
   asked: 0,
   streak: 0
@@ -378,31 +442,41 @@ function escapeHtml(s) {
   return s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
 }
 
+// Which forms of this letter are allowed at the current difficulty.
+function availablePositions(letter) {
+  return state.level === 'isolated'
+    ? ['isolated']
+    : POSITION_ORDER.filter(p => letter.forms[p] !== null);
+}
+
 /* =================================================================
-   4. BUILDING A QUESTION
-   Pick a letter, pick one of its forms, then pick three wrong answers.
-   Wrong answers come from the same skeleton group where possible, so
-   you are forced to actually look at the dots.
+   4. BUILDING A CARD AND A QUESTION
    ================================================================= */
+
+// Recall: just a letter and one of its shapes. No options.
+function makeCard() {
+  const letter = pickRandom(LETTERS);
+  return { letter, position: pickRandom(availablePositions(letter)) };
+}
+
+function nextCard() {
+  state.card = makeCard();
+  state.revealed = false;
+  render();
+}
+
+// Drill: a letter, a shape, and three wrong answers. Wrong answers
+// come from the same skeleton group where possible, so you are
+// forced to actually look at the dots.
 function makeQuestion() {
   const letter = pickRandom(LETTERS);
-
-  const available = state.level === 'isolated'
-    ? ['isolated']
-    : Object.keys(letter.forms).filter(k => letter.forms[k] !== null);
-
-  const position = pickRandom(available);
+  const position = pickRandom(availablePositions(letter));
 
   const sameGroup = LETTERS.filter(l => l.group === letter.group && l.name !== letter.name);
   const others    = LETTERS.filter(l => l.group !== letter.group);
-
   const distractors = [...shuffle(sameGroup), ...shuffle(others)].slice(0, 3);
 
-  return {
-    letter,
-    position,
-    options: shuffle([letter, ...distractors])
-  };
+  return { letter, position, options: shuffle([letter, ...distractors]) };
 }
 
 function nextQuestion() {
@@ -413,16 +487,32 @@ function nextQuestion() {
 
 /* =================================================================
    5. RENDERING
-   One function per screen. Each returns an HTML string.
+   One function per screen.
    ================================================================= */
 const view = document.getElementById('view');
 
-function renderLearn() {
+// --- the difficulty toggle, shared by Recall and Drill ---
+function levelPickerHtml() {
+  return `
+    <div class="levels" role="group" aria-label="Difficulty">
+      <button id="lvl-isolated" aria-pressed="${state.level === 'isolated'}">Letters on their own</button>
+      <button id="lvl-all" aria-pressed="${state.level === 'all'}">All four positions</button>
+    </div>`;
+}
+
+function wireLevelPicker(onChange) {
+  document.getElementById('lvl-isolated').onclick = () => { state.level = 'isolated'; onChange(); };
+  document.getElementById('lvl-all').onclick     = () => { state.level = 'all';      onChange(); };
+}
+
+/* ---------- TAB 1: REFERENCE ---------- */
+function renderReference() {
   let html = '';
 
   if (state.openLetter) {
     const l = state.openLetter;
-    const cells = ['isolated', 'initial', 'medial', 'final'].map(pos => {
+
+    const cells = POSITION_ORDER.map(pos => {
       const glyph = l.forms[pos];
       if (!glyph) {
         return `<div class="form-cell none">
@@ -431,7 +521,7 @@ function renderLearn() {
                 </div>`;
       }
       return `<div class="form-cell">
-                <div class="g">${paintGlyph(glyph)}</div>
+                <div class="g" dir="rtl">${paintGlyph(glyph)}</div>
                 <div class="n">${POSITION_NAMES[pos]}</div>
               </div>`;
     }).join('');
@@ -443,14 +533,16 @@ function renderLearn() {
     html += `<div class="detail">
                <h2>${escapeHtml(l.name)}</h2>
                <p class="sound">${escapeHtml(l.sound)}</p>
-               ${`<div class="forms">${cells}</div>`}
+               <div class="forms">${cells}</div>
                <p class="note">${joins} The gold strokes are not part of the letter — they are the joins to whatever sits beside it.</p>
              </div>`;
   }
 
-  html += `<div class="grid">` + LETTERS.map((l, i) =>
-    `<button class="tile" data-letter="${i}" aria-label="${escapeHtml(l.name)}">${l.ar}</button>`
-  ).join('') + `</div>`;
+  html += `<div class="grid">` + LETTERS.map((l, i) => `
+    <button class="tile" data-letter="${i}" aria-expanded="${state.openLetter === l}">
+      <span class="tile-glyph">${l.ar}</span>
+      <span class="tile-name">${escapeHtml(l.name)}</span>
+    </button>`).join('') + `</div>`;
 
   view.innerHTML = html;
 
@@ -464,6 +556,55 @@ function renderLearn() {
   });
 }
 
+/* ---------- TAB 2: RECALL ---------- */
+function renderRecall() {
+  if (!state.card) state.card = makeCard();
+
+  const { letter, position } = state.card;
+  const glyph = letter.forms[position];
+
+  const answer = state.revealed
+    ? `<div class="reveal">
+         <p class="rname">${escapeHtml(letter.name)}</p>
+         <p class="rsound">${escapeHtml(letter.sound)}</p>
+       </div>`
+    : `<p class="reveal-prompt">Tap the card to reveal</p>`;
+
+  view.innerHTML = `
+    ${levelPickerHtml()}
+
+    <div class="stage ${state.revealed ? '' : 'tappable'}" id="card" ${state.revealed ? '' : 'role="button" tabindex="0"'}>
+      <div class="glyph" dir="rtl">${paintGlyph(glyph)}</div>
+      <div class="position-label">${POSITION_NAMES[position]}</div>
+      ${answer}
+    </div>
+
+    <button class="next ${state.revealed ? '' : 'ghost'}" id="btn-next">
+      ${state.revealed ? 'Next letter' : 'Skip'}
+    </button>
+
+    <div class="score">
+      <span>Cards seen <b>${state.seen}</b></span>
+      <span>${state.level === 'isolated' ? 'Letters on their own' : 'All four positions'}</span>
+    </div>
+  `;
+
+  const card = document.getElementById('card');
+  if (!state.revealed) {
+    card.onclick = reveal;
+    card.onkeydown = e => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); reveal(); } };
+  }
+
+  document.getElementById('btn-next').onclick = () => { state.seen++; nextCard(); };
+  wireLevelPicker(nextCard);
+}
+
+function reveal() {
+  state.revealed = true;
+  render();
+}
+
+/* ---------- TAB 3: DRILL ---------- */
 function renderDrill() {
   if (!state.question) state.question = makeQuestion();
 
@@ -489,10 +630,7 @@ function renderDrill() {
   }
 
   view.innerHTML = `
-    <div class="levels" role="group" aria-label="Difficulty">
-      <button id="lvl-isolated" aria-pressed="${state.level === 'isolated'}">Letters on their own</button>
-      <button id="lvl-all" aria-pressed="${state.level === 'all'}">All four positions</button>
-    </div>
+    ${levelPickerHtml()}
 
     <div class="stage">
       <div class="glyph" dir="rtl">${paintGlyph(glyph)}</div>
@@ -512,13 +650,7 @@ function renderDrill() {
     btn.onclick = () => answer(btn.dataset.name);
   });
 
-  document.getElementById('lvl-isolated').onclick = () => setLevel('isolated');
-  document.getElementById('lvl-all').onclick = () => setLevel('all');
-}
-
-function setLevel(level) {
-  state.level = level;
-  nextQuestion();
+  wireLevelPicker(nextQuestion);
 }
 
 function answer(name) {
@@ -534,32 +666,50 @@ function answer(name) {
   render();
 }
 
+/* ---------- the dispatcher ---------- */
 function render() {
-  document.getElementById('btn-learn').setAttribute('aria-pressed', state.mode === 'learn');
-  document.getElementById('btn-drill').setAttribute('aria-pressed', state.mode === 'drill');
-  if (state.mode === 'learn') renderLearn();
+  ['reference', 'recall', 'drill'].forEach(m => {
+    document.getElementById('btn-' + m).setAttribute('aria-pressed', state.mode === m);
+  });
+
+  document.getElementById('mode-note').textContent = MODE_NOTES[state.mode];
+
+  if (state.mode === 'reference') renderReference();
+  else if (state.mode === 'recall') renderRecall();
   else renderDrill();
 }
 
 /* =================================================================
    6. WIRING IT UP
    ================================================================= */
-document.getElementById('btn-learn').onclick = () => { state.mode = 'learn'; render(); };
-document.getElementById('btn-drill').onclick = () => { state.mode = 'drill'; nextQuestion(); };
+document.getElementById('btn-reference').onclick = () => { state.mode = 'reference'; render(); };
+document.getElementById('btn-recall').onclick    = () => { state.mode = 'recall';    nextCard(); };
+document.getElementById('btn-drill').onclick     = () => { state.mode = 'drill';     nextQuestion(); };
 
 document.addEventListener('keydown', e => {
-  if (state.mode !== 'drill') return;
-
+  // Space and Enter move you forward in both practice modes.
   if (e.key === ' ' || e.key === 'Enter') {
-    e.preventDefault();
-    if (state.answered) nextQuestion();
-    return;
+    if (state.mode === 'recall') {
+      // The card itself handles this when it has keyboard focus.
+      if (document.activeElement && document.activeElement.id === 'card') return;
+      e.preventDefault();
+      if (state.revealed) { state.seen++; nextCard(); } else { reveal(); }
+      return;
+    }
+    if (state.mode === 'drill') {
+      e.preventDefault();
+      if (state.answered) nextQuestion();
+      return;
+    }
   }
 
-  const n = Number(e.key);
-  if (n >= 1 && n <= 4 && !state.answered) {
-    const btn = view.querySelectorAll('.choice')[n - 1];
-    if (btn) answer(btn.dataset.name);
+  // Number keys answer the drill.
+  if (state.mode === 'drill' && !state.answered) {
+    const n = Number(e.key);
+    if (n >= 1 && n <= 4) {
+      const btn = view.querySelectorAll('.choice')[n - 1];
+      if (btn) answer(btn.dataset.name);
+    }
   }
 });
 
