@@ -270,30 +270,63 @@
     font-size: 14px;
     padding: 9px 15px;
     cursor: pointer;
-    margin-bottom: 16px;
+    margin-bottom: 14px;
   }
 
   .play:hover { border-color: var(--saffron); color: var(--saffron); }
   .play svg { width: 15px; height: 15px; fill: currentColor; }
   .play.playing { border-color: var(--saffron); color: var(--saffron); }
 
+  /* Only takes up room when it actually has something to say. */
   .audio-status {
     font-size: 12px;
     color: var(--muted);
-    margin: 0 0 16px;
-    min-height: 16px;
+    margin: 0;
   }
 
-  /* ---- expanded letter detail ---- */
+  .audio-status:not(:empty) { margin: -6px 0 12px; }
+
+  /* ---- expanded letter detail ----
+     This sits on top of the page rather than inside it, pinned to the
+     bottom of the screen. That way opening a letter never pushes the
+     grid around, so you can tap straight down the alphabet and the
+     tiles stay exactly where they are. */
   .detail {
+    position: fixed;
+    bottom: 0;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 100%;
+    max-width: 520px;
     background: var(--surface);
     border: 1px solid var(--saffron);
-    border-radius: 14px;
-    padding: 20px 16px;
-    margin-bottom: 14px;
+    border-bottom: 0;
+    border-radius: 14px 14px 0 0;
+    padding: 18px 16px 20px;
+    box-shadow: 0 -18px 40px rgba(0, 0, 0, 0.55);
+    z-index: 10;
   }
 
-  .detail h2 { font-size: 20px; margin: 0 0 2px; }
+  .detail h2 { font-size: 20px; margin: 0 0 2px; padding-right: 34px; }
+
+  /* the close button in the corner of the sheet */
+  .sheet-close {
+    position: absolute;
+    top: 12px;
+    right: 12px;
+    width: 30px;
+    height: 30px;
+    background: none;
+    border: 1px solid var(--edge);
+    border-radius: 8px;
+    color: var(--muted);
+    font: inherit;
+    font-size: 17px;
+    line-height: 1;
+    cursor: pointer;
+  }
+
+  .sheet-close:hover { border-color: var(--saffron); color: var(--saffron); }
   .detail .sound { color: var(--muted); font-size: 14px; margin: 0 0 18px; }
 
   /* Left-to-right, because the labels under them are English and you
@@ -320,13 +353,17 @@
   .form-cell.none .g { color: var(--edge); }
 
   .note {
-    font-size: 13px;
+    font-size: 12px;
     color: var(--muted);
-    line-height: 1.55;
-    margin: 16px 0 0;
-    padding-top: 14px;
+    line-height: 1.5;
+    margin: 14px 0 0;
+    padding-top: 12px;
     border-top: 1px solid var(--edge);
   }
+
+  /* Blank space under the grid so the sheet never covers the last
+     letters. Its exact height is set in JS to match the sheet. */
+  .sheet-spacer { height: 0; }
 
   :focus-visible { outline: 2px solid var(--saffron); outline-offset: 2px; }
 
@@ -610,6 +647,7 @@ function wireLevelPicker(onChange) {
 /* ---------- TAB 1: REFERENCE ---------- */
 function renderReference() {
   let html = '';
+  let sheet = '';
 
   if (state.openLetter) {
     const l = state.openLetter;
@@ -632,7 +670,8 @@ function renderReference() {
       ? 'Connects on both sides.'
       : 'Never connects to the letter that follows it, so a word can break apart right after it.';
 
-    html += `<div class="detail">
+    sheet = `<div class="detail" id="sheet">
+               <button class="sheet-close" id="btn-close" aria-label="Close">&times;</button>
                <h2>${escapeHtml(l.name)}</h2>
                <p class="sound">${escapeHtml(l.sound)}</p>
                <button class="play" id="btn-play">${SPEAKER_ICON} Hear it</button>
@@ -646,9 +685,16 @@ function renderReference() {
     <button class="tile" data-letter="${i}" aria-expanded="${state.openLetter === l}">
       <span class="tile-glyph">${l.ar}</span>
       <span class="tile-name">${escapeHtml(l.name)}</span>
-    </button>`).join('') + `</div>`;
+    </button>`).join('') + `</div>
+    <div class="sheet-spacer" id="spacer"></div>` + sheet;
 
   view.innerHTML = html;
+
+  // Reserve blank space under the grid exactly as tall as the sheet,
+  // so the bottom row of letters is still reachable while it's open.
+  const sheetEl = document.getElementById('sheet');
+  const spacer = document.getElementById('spacer');
+  if (sheetEl && spacer) spacer.style.height = (sheetEl.offsetHeight + 16) + 'px';
 
   view.querySelectorAll('.tile').forEach(tile => {
     tile.onclick = () => {
@@ -656,17 +702,18 @@ function renderReference() {
       const wasOpen = state.openLetter === l;
       state.openLetter = wasOpen ? null : l;
       render();
-      // Tapping a letter opens it and says it out loud.
-      if (!wasOpen) {
-        playLetter(l);
-        window.scrollTo({ top: 0, behavior: 'smooth' });
-      }
+      // Tapping a letter opens it and says it out loud. The page does
+      // not scroll — you stay wherever you were in the alphabet.
+      if (!wasOpen) playLetter(l);
     };
   });
 
   // The "Hear it" button inside the opened letter.
   const playBtn = document.getElementById('btn-play');
   if (playBtn) playBtn.onclick = () => playLetter(state.openLetter);
+
+  const closeBtn = document.getElementById('btn-close');
+  if (closeBtn) closeBtn.onclick = () => { state.openLetter = null; render(); };
 }
 
 /* ---------- TAB 2: RECALL ---------- */
